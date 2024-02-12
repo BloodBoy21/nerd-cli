@@ -31,6 +31,7 @@ func FilterByModule(modules []helpers.Option,module string) map[string]*helpers.
 }
 
 
+
 func GetModule(modules map[string]*bool,flags map[string]interface{}) (Service, error) {
 	if modules["config"] == nil && modules["service"] == nil {
 		return nil, errors.New("No module selected")
@@ -45,4 +46,29 @@ func GetModule(modules map[string]*bool,flags map[string]interface{}) (Service, 
 		return NewConfigService(flags), nil
 	}
 	return nil, errors.New("No module selected")
+}
+
+func FillValues(flags map[string]interface{}, options map[string]*helpers.Option) {
+	for key, option := range options {
+		switch option.Type {
+		case "int":
+			option.Value = flags[key].(*int)
+		case "string":
+			option.Value = flags[key].(*string)
+		case "boolean":
+			option.Value = flags[key].(*bool)
+		}
+	}
+}
+
+func GetValue(option *helpers.Option) interface{} {
+	switch option.Type {
+	case "int":
+		return *option.Value.(*int)
+	case "string":
+		return *option.Value.(*string)
+	case "boolean":
+		return *option.Value.(*bool)
+	}
+	return nil
 }

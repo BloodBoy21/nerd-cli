@@ -19,18 +19,11 @@ func (c *ConfigService) GetOptions() {
 
 func (c *ConfigService) Run() {
 	fmt.Println("Running Config Service")
+	FillValues(c.AllFlags, c.Flags)
 	for key, option := range c.Flags {
-		flagPointer := c.AllFlags[key]
 		fmt.Println(key, option)
-		switch option.Type {
-		case "int":
-			fmt.Println(*flagPointer.(*int))
-		case "string":
-
-			fmt.Println(*flagPointer.(*string))
-		case "boolean":
-			fmt.Println(*flagPointer.(*bool))
-		}
+		value := GetValue(option)
+		fmt.Println(value)
 	}
 }
 

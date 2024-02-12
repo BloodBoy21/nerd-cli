@@ -12,7 +12,8 @@ type Option struct {
 	Description string `json:"description"`
 	Type        string `json:"type"`
 	Default     any    `json:"default"`
-	Module      string   `json:"module"`
+	Module      string `json:"module"`
+	Value       any    `json:"value"`
 }
 
 func OptionParser(path string) []Option {
@@ -28,8 +29,6 @@ func OptionParser(path string) []Option {
 	}
 	return options
 }
-
-
 
 func GetOptionFlags() map[string]interface{} {
 	flags := OptionParser("flags.json")
@@ -50,4 +49,3 @@ func GetOptionFlags() map[string]interface{} {
 	}
 	return flagMap
 }
-
