@@ -1,12 +1,5 @@
 [
   {
-    "name": "Authentication",
-    "flag": "auth",
-    "description": "Login to the registry. If no server is specified, the default registry is used.",
-    "type": "string",
-    "default": "test"
-  },
-  {
     "name": "Login",
     "flag": "login",
     "description": "Login to the registry. If no server is specified, the default registry is used.",
@@ -16,7 +9,7 @@
   },
   {
     "name": "Upload products",
-    "flag": "upload",
+    "flag": "upload-products",
     "description": "Upload products to the server",
     "type": "boolean",
     "default": false,
