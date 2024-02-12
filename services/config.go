@@ -5,6 +5,18 @@ import (
 	"nerd-cli/helpers"
 )
 
+type Command interface {
+	Run()
+}
+
+type CommandService struct {
+	command helpers.Option
+}
+
+func (c *CommandService) Run() {
+	fmt.Println("Running Command Service")
+}
+
 type ConfigService struct {
 	Options  []helpers.Option
 	Flags    map[string]*helpers.Option
@@ -17,15 +29,21 @@ func (c *ConfigService) GetOptions() {
 	c.Flags = FilterByModule(jsonOptions, c.module)
 }
 
+
+
 func (c *ConfigService) Run() {
 	fmt.Println("Running Config Service")
 	FillValues(c.AllFlags, c.Flags)
-	for key, option := range c.Flags {
-		fmt.Println(key, option)
-		value := GetValue(option)
-		fmt.Println(value)
+	fatherCommands := helpers.GetCustomFlags(c.Flags, func(option helpers.Option) bool {
+		return GetGroupFathers(option, c.module)
+	})
+	fatherCommand,error := FilterTrueOptions(fatherCommands)
+	if error != nil {
+		panic(error)
 	}
+	fmt.Println(fatherCommand[0])
 }
+
 
 func NewConfigService(flags map[string]interface{}) *ConfigService {
 	return &ConfigService{

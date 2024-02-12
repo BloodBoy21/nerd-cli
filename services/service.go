@@ -9,25 +9,41 @@ type Service interface {
 	GetOptions()
 	Run()
 }
-
-func filterTrueModules(modules map[string]*bool) []string {
-	var trueModules []string
-	for key, value := range modules {
-		if *value {
-			trueModules = append(trueModules, key)
+func FilterTrueOptions(options map[string]*helpers.Option) ([]*helpers.Option,error) {
+	var trueOption []*helpers.Option
+	for _, option := range options {
+		if *option.Value.(*bool) {
+			trueOption = append(trueOption, option)
 		}
 	}
-	return trueModules
+	if len(trueOption) == 0 {
+		return nil,errors.New("No option selected")
+	}
+	return trueOption,nil
+}
+
+func FilterTrueModule(options map[string]*bool) []string {
+	var trueOption []string
+	for key, value := range options {
+		if *value {
+			trueOption = append(trueOption, key)
+		}
+	}
+	return trueOption
 }
 
 func FilterByModule(modules []helpers.Option, module string) map[string]*helpers.Option {
-	filteredOptions := make(map[string]*helpers.Option)
+	filteredOptions := make([]helpers.Option, 0)
+	filteredDict := make(map[string]*helpers.Option)
 	for _, option := range modules {
 		if option.Module == module {
-			filteredOptions[option.Name] = &option
+			filteredOptions = append(filteredOptions, option)
 		}
 	}
-	return filteredOptions
+	for _, option := range filteredOptions {
+		filteredDict[option.Flag] = &option
+	}
+	return filteredDict
 }
 
 func GroupByModule(modules []helpers.Option) map[string][]helpers.Option {
@@ -58,15 +74,15 @@ func GetModule(modules map[string]*bool, flags map[string]interface{}) (Service,
 	if modules["config"] == nil && modules["service"] == nil {
 		return nil, errors.New("No module selected")
 	}
-	if len(filterTrueModules(modules)) > 1 {
+	if len(FilterTrueModule(modules)) > 1 {
 		return nil, errors.New("Multiple modules selected")
 	}
 
-	if len(filterTrueModules(modules)) == 0 {
+	if len(FilterTrueModule(modules)) == 0 {
 		return nil, errors.New("No module selected")
 	}
 
-	selectedModule := filterTrueModules(modules)[0]
+	selectedModule := FilterTrueModule(modules)[0]
 
 	switch selectedModule {
 	case "config":
@@ -76,26 +92,47 @@ func GetModule(modules map[string]*bool, flags map[string]interface{}) (Service,
 }
 
 func FillValues(flags map[string]interface{}, options map[string]*helpers.Option) {
-	for key, option := range options {
+	for _, option := range options {
+		key := option.Flag
 		switch option.Type {
 		case "int":
-			option.Value = flags[key].(*int)
+			if value, ok := flags[key].(*int); ok {
+				option.Value = value
+			}
 		case "string":
-			option.Value = flags[key].(*string)
+			if value, ok := flags[key].(*string); ok {
+				option.Value = value
+			}
 		case "boolean":
-			option.Value = flags[key].(*bool)
+			if value, ok := flags[key].(*bool); ok {
+				option.Value = value
+			}
 		}
 	}
 }
 
 func GetValue(option *helpers.Option) interface{} {
+	if option.Value == nil {
+		return nil
+	}
 	switch option.Type {
 	case "int":
-		return *option.Value.(*int)
+		if value, ok := option.Value.(*int); ok {
+			return *value
+		}
 	case "string":
-		return *option.Value.(*string)
+		if value, ok := option.Value.(*string); ok {
+			return *value
+		}
 	case "boolean":
-		return *option.Value.(*bool)
+		if value, ok := option.Value.(*bool); ok {
+			return *value
+		}
 	}
+
 	return nil
+}
+
+func GetGroupFathers(option helpers.Option,module string) bool {
+	return option.Module == module && option.IsFather
 }

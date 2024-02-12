@@ -5,7 +5,9 @@
     "description": "Login to the registry. If no server is specified, the default registry is used.",
     "type": "boolean",
     "default": false,
-    "module": "config"
+    "module": "config",
+    "isFather": true,
+    "fathers": []
   },
   {
     "name": "Upload products",
@@ -13,6 +15,8 @@
     "description": "Upload products to the server",
     "type": "boolean",
     "default": false,
-    "module": "service"
+    "module": "service",
+    "isFather": true,
+    "fathers": []
   }
 ]
