@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"os"
+	"strconv"
 )
 
 type FilterCallback func(option Option) bool
@@ -43,7 +44,8 @@ func GetOptionFlags() map[string]interface{} {
 		var flagValue interface{}
 		switch option.Type {
 		case "int":
-			flagValue = flag.Int(option.Flag, option.Default.(int), option.Description)
+			value,_ := strconv.Atoi(option.Default.(string))
+			flagValue = flag.Int(option.Flag, value, option.Description)
 		case "string":
 			flagValue = flag.String(option.Flag, option.Default.(string), option.Description)
 		case "boolean":
@@ -75,12 +77,34 @@ func GetFlags (flags map[string]*Option,keys []string) map[string]*Option {
 	return flagsFound
 }
 
-func GetCustomFlags (flags map[string]*Option,callback FilterCallback) map[string]*Option {
-	flagsFound := make(map[string]*Option)
+func GetCustomFlags (flags map[string]*Option,callback FilterCallback) map[string]Option {
+	flagsFound := make(map[string]Option)
 	for key, option := range flags {
 		if callback(*option) {
-			flagsFound[key] = option
+			flagsFound[key] = *option
 		}
 	}
 	return flagsFound
+}
+
+func GetValue(option *Option) interface{} {
+	if option.Value == nil {
+		return nil
+	}
+	switch option.Type {
+	case "int":
+		if value, ok := option.Value.(*int); ok {
+			return *value
+		}
+	case "string":
+		if value, ok := option.Value.(*string); ok {
+			return *value
+		}
+	case "boolean":
+		if value, ok := option.Value.(*bool); ok {
+			return *value
+		}
+	}
+
+	return nil
 }

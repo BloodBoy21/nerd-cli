@@ -9,17 +9,17 @@ type Service interface {
 	GetOptions()
 	Run()
 }
-func FilterTrueOptions(options map[string]*helpers.Option) ([]*helpers.Option,error) {
-	var trueOption []*helpers.Option
+func FilterTrueOptions(options map[string]helpers.Option) (helpers.Option,error) {
+	var trueOption []helpers.Option
 	for _, option := range options {
 		if *option.Value.(*bool) {
 			trueOption = append(trueOption, option)
 		}
 	}
 	if len(trueOption) == 0 {
-		return nil,errors.New("No option selected")
+		return helpers.Option{},errors.New("No option selected")
 	}
-	return trueOption,nil
+	return trueOption[0],nil
 }
 
 func FilterTrueModule(options map[string]*bool) []string {
@@ -33,18 +33,18 @@ func FilterTrueModule(options map[string]*bool) []string {
 }
 
 func FilterByModule(modules []helpers.Option, module string) map[string]*helpers.Option {
-	filteredOptions := make([]helpers.Option, 0)
 	filteredDict := make(map[string]*helpers.Option)
+
 	for _, option := range modules {
 		if option.Module == module {
-			filteredOptions = append(filteredOptions, option)
+			_option := option // Create a new variable inside the loop
+			filteredDict[_option.Flag] = &_option
 		}
 	}
-	for _, option := range filteredOptions {
-		filteredDict[option.Flag] = &option
-	}
+
 	return filteredDict
 }
+
 
 func GroupByModule(modules []helpers.Option) map[string][]helpers.Option {
 	groupedOptions := make(map[string][]helpers.Option)
@@ -82,13 +82,7 @@ func GetModule(modules map[string]*bool, flags map[string]interface{}) (Service,
 		return nil, errors.New("No module selected")
 	}
 
-	selectedModule := FilterTrueModule(modules)[0]
-
-	switch selectedModule {
-	case "config":
-		return NewConfigService(flags), nil
-	}
-	return nil, errors.New("No module selected")
+	return NewService(flags, FilterTrueModule(modules)[0]), nil
 }
 
 func FillValues(flags map[string]interface{}, options map[string]*helpers.Option) {
@@ -111,28 +105,19 @@ func FillValues(flags map[string]interface{}, options map[string]*helpers.Option
 	}
 }
 
-func GetValue(option *helpers.Option) interface{} {
-	if option.Value == nil {
-		return nil
-	}
-	switch option.Type {
-	case "int":
-		if value, ok := option.Value.(*int); ok {
-			return *value
-		}
-	case "string":
-		if value, ok := option.Value.(*string); ok {
-			return *value
-		}
-	case "boolean":
-		if value, ok := option.Value.(*bool); ok {
-			return *value
-		}
-	}
 
-	return nil
-}
 
 func GetGroupFathers(option helpers.Option,module string) bool {
 	return option.Module == module && option.IsFather
+}
+func containsValue(slice []string, target string) bool {
+	for _, value := range slice {
+		if value == target {
+			return true
+		}
+	}
+	return false
+}
+func GetGroupChildren(option helpers.Option,module string) bool {
+	return containsValue(option.Fathers,module) && !option.IsFather
 }

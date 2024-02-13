@@ -18,5 +18,17 @@
     "module": "service",
     "isFather": true,
     "fathers": []
+  },
+  {
+    "name": "Account",
+    "flag": "account",
+    "description": "Account to use",
+    "type": "int",
+    "default": "1",
+    "module": "service",
+    "isFather": false,
+    "fathers": [
+      "upload-products"
+    ]
   }
 ]

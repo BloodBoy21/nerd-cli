@@ -12,8 +12,9 @@
       "program": "${workspaceFolder}/main.go",
       "env": {},
       "args": [
-        "--config",
-        "--login"
+        "--service",
+        "--upload-products",
+        "--account=500"
       ]
     }
   ]
