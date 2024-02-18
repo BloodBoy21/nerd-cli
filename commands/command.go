@@ -13,9 +13,21 @@ type CommandService struct {
 	Flags  map[string] helpers.Option
 }
 
-func (c *CommandService) Run() {
-	fmt.Printf("Running %s command\n", c.Command.Flag)
-	for key, value := range c.Flags {
-		fmt.Printf("Flag: %s, Value: %v\n", key, helpers.GetValue(&value))
+
+func getCommandCallback(command helpers.Option) func(*CommandService) {
+	switch command.Flag {
+	case "login":
+		return Login
+	default:
+		return nil
 	}
+}
+
+func (command *CommandService) Run() {
+	callback := getCommandCallback(command.Command)
+	if callback == nil {
+		fmt.Println("Command not found")
+		return
+	}
+	callback(command)
 }

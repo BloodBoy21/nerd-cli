@@ -74,15 +74,16 @@ func GetModule(modules map[string]*bool, flags map[string]interface{}) (Service,
 	if modules["config"] == nil && modules["service"] == nil {
 		return nil, errors.New("No module selected")
 	}
-	if len(FilterTrueModule(modules)) > 1 {
+	filterModules := FilterTrueModule(modules)
+	if len(filterModules) > 1 {
 		return nil, errors.New("Multiple modules selected")
 	}
 
-	if len(FilterTrueModule(modules)) == 0 {
+	if len(filterModules) == 0 {
 		return nil, errors.New("No module selected")
 	}
 
-	return NewService(flags, FilterTrueModule(modules)[0]), nil
+	return NewService(flags, filterModules[0]), nil
 }
 
 func FillValues(flags map[string]interface{}, options map[string]*helpers.Option) {

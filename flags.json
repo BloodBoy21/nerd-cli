@@ -24,7 +24,7 @@
     "flag": "account",
     "description": "Account to use",
     "type": "int",
-    "default": "1",
+    "default": "0",
     "module": "service",
     "isFather": false,
     "fathers": [
