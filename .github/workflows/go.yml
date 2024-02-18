@@ -6,7 +6,7 @@ name: Go
 on:
   push:
     branches: [ "main" ]
-  pull_request:
+  pull_request:kc
     branches: [ "main" ]
 
 jobs:
@@ -26,3 +26,7 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+    
+    - name: Go Release Binaries
+      uses: wangyoucao577/go-release-action@v1.48
+  
