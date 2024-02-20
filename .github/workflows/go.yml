@@ -44,7 +44,7 @@ jobs:
         goarch: amd64
         overwrite: true
   release-arm-darwin:
-    name: release arm/darwin
+    name: release darwin/arm64
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -54,4 +54,3 @@ jobs:
         goos: darwin
         goarch: arm64
         overwrite: true
-  
